@@ -1,0 +1,193 @@
+{
+  "project_name": "NextHeir",
+  "platform": "React Native Expo",
+  "theme": "Dark",
+  "archetype": "Archetype 5: Jewel & Luxury",
+  "vibe": "Premium, Fintech, Legal-grade, Private, Sophisticated",
+  "global_rules": {
+    "touch_targets": "Minimum 44px x 44px for all interactive elements.",
+    "safe_area": "All screens must wrap content in SafeAreaView or use useSafeAreaInsets().",
+    "excluded_features": ["Family Tree visualization"],
+    "styling_approach": "React Native StyleSheet / inline styles (or Tailwind if configured in Expo via NativeWind). We assume standard RN StyleSheet for this spec."
+  },
+  "colors": {
+    "background": {
+      "default": "#0A0A0E",
+      "paper": "#121218",
+      "surface": "#1A1A24"
+    },
+    "brand": {
+      "primary": "#D4AF37",
+      "primary_dim": "rgba(212, 175, 55, 0.15)",
+      "secondary": "#8C92AC",
+      "accent": "#FFBF00"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#A0A0A5",
+      "disabled": "#5A5A65",
+      "inverse": "#000000"
+    },
+    "border": {
+      "default": "rgba(255, 255, 255, 0.08)",
+      "focus": "#D4AF37",
+      "error": "#E57373"
+    },
+    "status": {
+      "success": "#4CAF50",
+      "warning": "#FF9800",
+      "error": "#F44336",
+      "fairness_high": "#4CAF50",
+      "fairness_medium": "#FFB300",
+      "fairness_low": "#F44336"
+    }
+  },
+  "typography": {
+    "font_family": {
+      "heading": "PlayfairDisplay_600SemiBold",
+      "body": "Manrope_400Regular",
+      "body_medium": "Manrope_500Medium",
+      "body_bold": "Manrope_700Bold"
+    },
+    "sizes": {
+      "h1": { "fontSize": 36, "lineHeight": 44, "letterSpacing": -0.5 },
+      "h2": { "fontSize": 28, "lineHeight": 36, "letterSpacing": -0.3 },
+      "h3": { "fontSize": 22, "lineHeight": 30, "letterSpacing": 0 },
+      "body_large": { "fontSize": 18, "lineHeight": 26 },
+      "body_default": { "fontSize": 16, "lineHeight": 24 },
+      "caption": { "fontSize": 14, "lineHeight": 20, "letterSpacing": 0.2 },
+      "overline": { "fontSize": 12, "lineHeight": 16, "letterSpacing": 1.5, "textTransform": "uppercase" }
+    }
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32,
+    "2xl": 48,
+    "3xl": 64
+  },
+  "borders": {
+    "radius": {
+      "sm": 4,
+      "md": 8,
+      "lg": 16,
+      "xl": 24,
+      "pill": 9999
+    },
+    "width": {
+      "hairline": 1,
+      "thick": 2
+    }
+  },
+  "shadows": {
+    "glow": {
+      "shadowColor": "#D4AF37",
+      "shadowOffset": { "width": 0, "height": 4 },
+      "shadowOpacity": 0.3,
+      "shadowRadius": 12,
+      "elevation": 8
+    },
+    "ambient": {
+      "shadowColor": "#000000",
+      "shadowOffset": { "width": 0, "height": 8 },
+      "shadowOpacity": 0.5,
+      "shadowRadius": 24,
+      "elevation": 12
+    }
+  },
+  "icons": {
+    "library": "@expo/vector-icons/Ionicons",
+    "stroke_width": "Thin/Outline styles preferred (e.g., ios-home-outline)",
+    "mapping": {
+      "dashboard": "pie-chart-outline",
+      "assets": "briefcase-outline",
+      "family": "people-outline",
+      "scenarios": "git-network-outline",
+      "ai_chat": "sparkles-outline",
+      "settings": "settings-outline",
+      "add": "add-circle-outline",
+      "share": "share-outline",
+      "export": "document-text-outline"
+    }
+  },
+  "animations": {
+    "library": "react-native-reanimated",
+    "patterns": {
+      "floating": {
+        "description": "Continuous slow vertical translation mimicking breathing/floating.",
+        "config": "withRepeat(withTiming(value, { duration: 3000, easing: Easing.inOut(Easing.ease) }), -1, true)"
+      },
+      "press": {
+        "description": "Scale down to 0.96 on press for buttons and interactive cards.",
+        "config": "withSpring(0.96, { damping: 10, stiffness: 400 })"
+      },
+      "fade_in_up": {
+        "description": "Staggered entrance for list items.",
+        "config": "opacity 0 -> 1, translateY 20 -> 0 over 400ms with Easing.out(Easing.cubic)"
+      }
+    }
+  },
+  "components": {
+    "button": {
+      "primary": "Background #D4AF37, Text #000000, BorderRadius pill, PaddingVertical 16px, MinHeight 56px. Font Manrope_700Bold.",
+      "secondary": "Background transparent, Border 1px #D4AF37, Text #D4AF37, BorderRadius pill, PaddingVertical 16px.",
+      "ghost": "Background transparent, Text #A0A0A5, MinHeight 44px."
+    },
+    "card": {
+      "default": "Background #121218, Border 1px rgba(255,255,255,0.05), BorderRadius 16px, Padding 24px. Ambient shadow.",
+      "premium": "Background #1A1A24, Border 1px rgba(212,175,55,0.3), BorderRadius 16px, Padding 24px. Subtle gold glow."
+    },
+    "input": {
+      "default": "Background rgba(255,255,255,0.03), BorderBottom 1px rgba(255,255,255,0.2), Color #FFFFFF, MinHeight 56px. Placeholder #5A5A65."
+    },
+    "bottom_sheet": {
+      "default": "Background #121218, TopLeft/TopRight Radius 24px, subtle handle indicator at top."
+    }
+  },
+  "screens": {
+    "Onboarding": {
+      "layout": "Hero image background (abstract gold/black), overlay gradient from transparent to #0A0A0E at bottom. Text at bottom: Playfair Display H1, Manrope Body. 'Get Started' primary button with floating animation.",
+      "features": "Email/Phone OTP inputs shown in a sliding BottomSheet."
+    },
+    "Dashboard": {
+      "layout": "Top section: Total Estate Value with large typography. Middle: Quick stats (X Assets, Y Family Members, Z Scenarios). Bottom: Recent AI insights. Use a floating 'Sparkle' icon for AI Chat FAB.",
+      "navigation": "Bottom Tab Navigation (Dashboard, Assets, Family, Scenarios)."
+    },
+    "AssetManagement": {
+      "layout": "List of assets categorized by Property, Business, Investments. Cards use 'default' styling. Floating Action Button (FAB) to Add Asset.",
+      "interactions": "Swipe left to Edit/Delete."
+    },
+    "FamilyManagement": {
+      "layout": "List of members. Avatar placeholders. Display age, relationship, and small chips for 'Financial Needs'. Exclude Family Tree view entirely. Focus on list/card view."
+    },
+    "Scenarios": {
+      "layout": "Carousel or horizontal scroll of different Scenarios. Inside a Scenario: List of assets with slider/input to allocate percentage to family members. Top right: 'Fairness Score' dial. 'Export PDF' button in header."
+    },
+    "AIChat": {
+      "layout": "Dark chat interface. User messages align right, gray bubble. AI messages align left, #121218 bubble with gold left border. Input bar at bottom with glassmorphism blur."
+    }
+  },
+  "media_urls": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1761437855598-011cf89b2ad4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwxfHxnb2xkJTIwYW5kJTIwYmxhY2slMjBhYnN0cmFjdCUyMHRleHR1cmV8ZW58MHx8fHwxNzc4NDgwMDkyfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract golden metallic curves on black. Use as full-screen onboarding background."
+    },
+    "premium_texture": {
+      "url": "https://images.unsplash.com/photo-1771226281605-f1e505ade901?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMGRhcmslMjBsdXh1cnklMjB0ZXh0dXJlJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3Nzg0ODAwOTJ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract dark geometric pattern. Use for empty states or subtle card backgrounds."
+    },
+    "estate_placeholder": {
+      "url": "https://images.unsplash.com/photo-1629787302738-2c6e9f3dada1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBtb2Rlcm4lMjBlc3RhdGUlMjBhcmNoaXRlY3R1cmV8ZW58MHx8fHwxNzc4NDgwMDg3fDA&ixlib=rb-4.1.0&q=85",
+      "description": "White concrete luxury architecture. Use as a placeholder for Property assets."
+    },
+    "fabric_accent": {
+      "url": "https://images.unsplash.com/photo-1760224254117-7a40f7f03fe2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGRhcmslMjBsdXh1cnklMjB0ZXh0dXJlJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3Nzg0ODAwOTJ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Dark blue/black fabric texture. Use for premium headers or modal backgrounds."
+    }
+  },
+  "testing": {
+    "required_attributes": "Add testID prop (React Native equivalent to data-testid) to all interactive elements, e.g., testID='login-submit-button'."
+  }
+}
