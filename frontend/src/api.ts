@@ -67,8 +67,8 @@ export const api = {
   pdfUrl: (id: string) => `${API}/scenarios/${id}/pdf`,
 
   // chat
-  chat: (message: string, session_id?: string) =>
-    request('/chat', { method: 'POST', body: JSON.stringify({ message, session_id }) }),
+  chat: (message: string, session_id?: string, scenario_ids?: string[]) =>
+    request('/chat', { method: 'POST', body: JSON.stringify({ message, session_id, scenario_ids }) }),
   chatHistory: (session_id?: string) =>
     request(`/chat/history${session_id ? `?session_id=${session_id}` : ''}`),
   clearChat: (session_id?: string) =>

@@ -125,6 +125,7 @@ class ScenarioIn(BaseModel):
 class ChatMessageIn(BaseModel):
     session_id: Optional[str] = None
     message: str
+    scenario_ids: Optional[List[str]] = None
 
 
 # ============ Auth Endpoints ============
@@ -459,25 +460,60 @@ async def chat_message(data: ChatMessageIn, user=Depends(get_current_user)):
     assets = await db.assets.find({'user_id': user['id']}, {'_id': 0}).to_list(1000)
     family = await db.family.find({'user_id': user['id']}, {'_id': 0}).to_list(1000)
     total_value = sum(a.get('value', 0) for a in assets)
+    asset_map = {a['id']: a for a in assets}
+    member_map = {m['id']: m for m in family}
 
     context = f"""User's Estate Snapshot:
 - Total estate value: ₹{total_value:,.0f}
 - Assets ({len(assets)}): {', '.join([f"{a.get('name')} ({a.get('category')}, ₹{a.get('value', 0):,.0f})" for a in assets[:10]]) or 'none yet'}
-- Family members ({len(family)}): {', '.join([f"{m.get('name')} ({m.get('relationship')})" for m in family[:10]]) or 'none yet'}
+- Family members ({len(family)}): {', '.join([f"{m.get('name')} ({m.get('relationship')}, needs: {m.get('financial_needs', 'unknown')})" for m in family[:10]]) or 'none yet'}
 """
+
+    # If user has selected scenarios for comparison, include detailed allocations + analysis
+    scenarios_block = ""
+    if data.scenario_ids:
+        selected = await db.scenarios.find(
+            {'id': {'$in': data.scenario_ids}, 'user_id': user['id']},
+            {'_id': 0},
+        ).to_list(50)
+        if selected:
+            parts = []
+            for s in selected:
+                lines = [f"\n=== SCENARIO: \"{s.get('name')}\" ==="]
+                if s.get('description'):
+                    lines.append(f"Description: {s['description']}")
+                # Per-member totals
+                m_totals: Dict[str, float] = {m['id']: 0.0 for m in family}
+                for aid, alloc in (s.get('allocations') or {}).items():
+                    a = asset_map.get(aid)
+                    if not a:
+                        continue
+                    for mid, pct in alloc.items():
+                        if mid in m_totals:
+                            m_totals[mid] += a.get('value', 0) * float(pct) / 100.0
+                lines.append("Distribution:")
+                for mid, total in m_totals.items():
+                    if total <= 0:
+                        continue
+                    m = member_map.get(mid, {})
+                    share = (total / total_value * 100) if total_value else 0
+                    lines.append(f"  - {m.get('name', 'Unknown')} ({m.get('relationship', '')}): ₹{total:,.0f} ({share:.1f}%)")
+                ana = s.get('analysis')
+                if ana:
+                    lines.append(f"AI Fairness Score: {ana.get('fairness_score', 'N/A')}/100 ({ana.get('fairness_label', '')})")
+                    if ana.get('summary'):
+                        lines.append(f"Prior AI Summary: {ana['summary']}")
+                else:
+                    lines.append("(Not yet analyzed)")
+                parts.append('\n'.join(lines))
+            scenarios_block = "\n\nSCENARIOS SELECTED FOR COMPARISON:\n" + '\n'.join(parts) + "\n\nWhen the user asks a comparison question, contrast these scenarios across fairness, conflict risk, financial need coverage, and family harmony. Recommend the strongest option with reasoning, then highlight one trade-off."
 
     system_msg = f"""You are NextHeir AI, a warm and insightful inheritance planning advisor for high-net-worth families.
 You help users think through fairness, emotional dynamics, conflict prevention, and long-term family harmony.
-Keep replies concise (under 180 words), use bullets when helpful, and always end with a thoughtful follow-up question.
+Keep replies concise (under 220 words), use bullets when helpful, and always end with a thoughtful follow-up question.
 Never provide legal or tax advice — always remind users to consult their CA or lawyer for final decisions.
 
-{context}"""
-
-    # Load prior history
-    history = await db.chat_messages.find(
-        {'user_id': user['id'], 'session_id': session_id},
-        {'_id': 0},
-    ).sort('created_at', 1).to_list(100)
+{context}{scenarios_block}"""
 
     try:
         chat = LlmChat(
@@ -485,12 +521,6 @@ Never provide legal or tax advice — always remind users to consult their CA or
             session_id=session_id,
             system_message=system_msg,
         ).with_model("gemini", "gemini-3-flash-preview")
-
-        # Replay history so the model has context (LlmChat treats each instance fresh)
-        for msg in history:
-            if msg['role'] == 'user':
-                await chat.send_message(UserMessage(text=msg['content']))
-                # Note: emergentintegrations stores history internally, but to keep it simple, we just send new message
 
         response_text = await chat.send_message(UserMessage(text=data.message))
     except Exception as e:
