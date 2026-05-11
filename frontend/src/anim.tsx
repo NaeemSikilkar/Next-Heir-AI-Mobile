@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { ViewStyle, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,6 +9,8 @@ import Animated, {
   withSequence,
   withDelay,
 } from 'react-native-reanimated';
+
+const isWeb = Platform.OS === 'web';
 
 export const Floating: React.FC<{ children: React.ReactNode; range?: number; duration?: number; style?: ViewStyle }> = ({
   children,
@@ -33,9 +35,11 @@ export const FadeInUp: React.FC<{ children: React.ReactNode; delay?: number; sty
   delay = 0,
   style,
 }) => {
-  const o = useSharedValue(0);
-  const y = useSharedValue(20);
+  // Start visible to avoid invisible content on web if effect doesn't run
+  const o = useSharedValue(isWeb ? 1 : 0);
+  const y = useSharedValue(isWeb ? 0 : 20);
   useEffect(() => {
+    if (isWeb) return;
     o.value = withDelay(delay, withTiming(1, { duration: 500, easing: Easing.out(Easing.cubic) }));
     y.value = withDelay(delay, withTiming(0, { duration: 500, easing: Easing.out(Easing.cubic) }));
   }, [delay]);
