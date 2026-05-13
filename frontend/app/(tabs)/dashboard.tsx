@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, Alert, Image, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,22 @@ import { colors, spacing, radius, typography, shadows, formatCurrency, ASSET_CAT
 import { FadeInUp, Floating, Pulse } from '../../src/anim';
 import { api } from '../../src/api';
 import { useAuth } from '../../src/auth';
+
+const HOW_IT_WORKS = [
+  { title: 'Add Assets', desc: 'Property, businesses, investments, precious metals', icon: 'briefcase-outline' },
+  { title: 'Define Family', desc: 'Map relationships, needs, and circumstances', icon: 'people-outline' },
+  { title: 'Simulate Outcomes', desc: 'AI-powered fairness analysis and conflict detection', icon: 'bar-chart-outline' },
+];
+
+const TIPS = [
+  { title: 'Start simple', desc: 'Begin by adding your major assets and family members. You don\u2019t need perfect data \u2014 just enough to create a basic structure.' },
+  { title: 'Use approximate values', desc: 'It is not necessary to enter actual property or asset values. You can use rough or hypothetical numbers to explore different scenarios safely.' },
+  { title: 'Create multiple scenarios', desc: 'Don\u2019t rely on just one distribution. Try different combinations to compare outcomes and understand trade-offs.' },
+  { title: 'Think beyond equality', desc: 'Equal distribution may not always be practical. Use the tool to explore what is fair based on contribution, needs, and future stability.' },
+  { title: 'Leverage AI insights', desc: 'Use the AI chat to ask questions around emotional balance, conflict risks, and fairness. This is where deeper insights emerge.' },
+  { title: 'Focus on risk signals', desc: 'Pay attention to fairness scores and risk alerts. These highlight potential issues that may not be obvious in discussions.' },
+  { title: 'Iterate and refine', desc: 'Adjust allocations based on insights and re-run simulations to gradually move toward a more balanced outcome.' },
+];
 
 export default function Dashboard() {
   const router = useRouter();
@@ -188,6 +204,99 @@ export default function Dashboard() {
             <Ionicons name="arrow-forward" size={20} color={colors.primary} />
           </Pressable>
         </FadeInUp>
+
+        {/* How it Works */}
+        <FadeInUp delay={460}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.overline}>The Process</Text>
+            <Text style={styles.sectionTitle}>How it Works</Text>
+          </View>
+          {HOW_IT_WORKS.map((step, i) => (
+            <View key={step.title} style={styles.stepCard} testID={`step-${i + 1}`}>
+              <Floating range={3} duration={2800 + i * 300}>
+                <View style={styles.stepIcon}>
+                  <Ionicons name={step.icon as any} size={22} color={colors.primary} />
+                </View>
+              </Floating>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.stepLabel}>STEP {i + 1}</Text>
+                <Text style={styles.stepTitle}>{step.title}</Text>
+                <Text style={styles.stepDesc}>{step.desc}</Text>
+              </View>
+            </View>
+          ))}
+        </FadeInUp>
+
+        {/* Tips */}
+        <FadeInUp delay={510}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.overline}>Getting Started</Text>
+            <Text style={styles.sectionTitle}>Tips on How to Use NextHeir</Text>
+          </View>
+          {TIPS.map((tip, i) => (
+            <View key={tip.title} style={styles.tipCard} testID={`tip-${i + 1}`}>
+              <View style={styles.tipNum}>
+                <Text style={styles.tipNumText}>{i + 1}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.tipTitle}>{tip.title}</Text>
+                <Text style={styles.tipDesc}>{tip.desc}</Text>
+              </View>
+            </View>
+          ))}
+
+          <View style={styles.disclaimerCard} testID="dashboard-disclaimer">
+            <View style={styles.disclaimerHead}>
+              <Ionicons name="warning-outline" size={18} color={colors.warning} />
+              <Text style={styles.disclaimerTitle}>Disclaimer</Text>
+            </View>
+            <Text style={styles.disclaimerText}>
+              The outputs provided by NextHeir are AI-generated and based solely on the limited inputs you provide.
+              They are indicative in nature and should not be considered as financial or legal advice. Please consult
+              your Chartered Accountant (CA), lawyer, or wealth manager before making any final decisions.
+            </Text>
+          </View>
+        </FadeInUp>
+
+        {/* Developed By */}
+        <FadeInUp delay={560}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.overline}>Developed By</Text>
+          </View>
+          <View style={styles.devCard} testID="developed-by-card">
+            <View style={styles.devTop}>
+              <Image
+                source={{ uri: 'https://customer-assets.emergentagent.com/job_heir-mobile/artifacts/l0n3k7u9_Untitled%20design%20%282%29.jpg' }}
+                style={styles.devAvatar}
+              />
+              <View style={{ flex: 1, marginLeft: spacing.md }}>
+                <Text style={styles.devName}>Naeem Sikilkar</Text>
+                <Pressable
+                  testID="linkedin-link"
+                  onPress={() => Linking.openURL('https://www.linkedin.com/in/naeem-sikilkar-64238395/')}
+                  style={styles.linkedinBtn}
+                >
+                  <Ionicons name="logo-linkedin" size={14} color={colors.primary} />
+                  <Text style={styles.linkedinText}>LinkedIn Profile</Text>
+                </Pressable>
+              </View>
+            </View>
+            <Text style={styles.devBio}>
+              NextHeir was built by Naeem Sikilkar, an aspiring AI Product Manager, using structured product
+              thinking frameworks like CIRCLES combined with modern vibe-coding platforms to rapidly prototype
+              and validate ideas.{'\n\n'}
+              The inspiration behind NextHeir comes from a deeply personal experience — observing challenges
+              within his own family around wealth distribution due to the absence of a formal will. This
+              highlighted a common yet unspoken problem: decisions involving inheritance are often driven by
+              emotions, assumptions, and lack of clarity, which can unintentionally strain relationships.{'\n\n'}
+              NextHeir was envisioned as a solution to bring clarity, structure, and foresight into such
+              sensitive decisions. While not a replacement for human judgment or legal advice, the platform
+              aims to provide scenario-based insights, helping families explore different allocation
+              possibilities, anticipate potential conflicts, and make more informed, balanced decisions —
+              without compromising the bonds that matter most.
+            </Text>
+          </View>
+        </FadeInUp>
       </ScrollView>
     </SafeAreaView>
   );
@@ -245,4 +354,51 @@ const styles = StyleSheet.create({
   aiIconBox: { width: 48, height: 48, borderRadius: radius.pill, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
   aiTitle: { color: colors.textPrimary, fontSize: 16, fontWeight: '700' },
   aiSub: { color: colors.textSecondary, fontSize: 13, marginTop: 2 },
+  sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md },
+  stepCard: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    backgroundColor: colors.paper, padding: spacing.lg, borderRadius: radius.lg,
+    borderWidth: 1, borderColor: colors.border, marginBottom: spacing.sm,
+  },
+  stepIcon: {
+    width: 48, height: 48, borderRadius: radius.md, backgroundColor: colors.primarySoft,
+    alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.borderGold,
+  },
+  stepLabel: { ...typography.overline, color: colors.textSecondary, marginBottom: 4 },
+  stepTitle: { color: colors.textPrimary, fontSize: 17, fontWeight: '700', marginBottom: 4 },
+  stepDesc: { color: colors.textSecondary, fontSize: 13, lineHeight: 18 },
+  tipCard: {
+    flexDirection: 'row', gap: spacing.md, backgroundColor: colors.paper,
+    padding: spacing.md, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border,
+    marginBottom: spacing.sm,
+  },
+  tipNum: {
+    width: 28, height: 28, borderRadius: 8, backgroundColor: colors.surface,
+    alignItems: 'center', justifyContent: 'center', marginTop: 2,
+    borderWidth: 1, borderColor: colors.border,
+  },
+  tipNumText: { color: colors.primary, fontWeight: '700', fontSize: 13 },
+  tipTitle: { color: colors.textPrimary, fontSize: 15, fontWeight: '700', marginBottom: 4 },
+  tipDesc: { color: colors.textSecondary, fontSize: 13, lineHeight: 19 },
+  disclaimerCard: {
+    backgroundColor: 'rgba(255,152,0,0.08)', borderWidth: 1, borderColor: 'rgba(255,152,0,0.3)',
+    padding: spacing.lg, borderRadius: radius.lg, marginTop: spacing.md,
+  },
+  disclaimerHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginBottom: spacing.sm },
+  disclaimerTitle: { color: colors.warning, fontWeight: '700', fontSize: 14 },
+  disclaimerText: { color: colors.textSecondary, fontSize: 13, lineHeight: 20 },
+  devCard: {
+    backgroundColor: colors.paper, padding: spacing.lg, borderRadius: radius.lg,
+    borderWidth: 1, borderColor: colors.borderGold,
+  },
+  devTop: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md },
+  devAvatar: { width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: colors.primary, backgroundColor: colors.surface },
+  devName: { color: colors.textPrimary, fontSize: 18, fontWeight: '700', marginBottom: 6 },
+  linkedinBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start',
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill,
+    backgroundColor: colors.primarySoft, borderWidth: 1, borderColor: colors.borderGold,
+  },
+  linkedinText: { color: colors.primary, fontSize: 12, fontWeight: '700' },
+  devBio: { color: colors.textSecondary, fontSize: 13, lineHeight: 20 },
 });
