@@ -3,12 +3,14 @@ import { View, Text, StyleSheet, FlatList, Pressable, Alert, RefreshControl } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, radius, typography, shadows, formatCurrencyFull, ASSET_CATEGORIES } from '../../src/theme';
+import { colors, spacing, radius, typography, shadows, ASSET_CATEGORIES } from '../../src/theme';
 import { FadeInUp, Floating } from '../../src/anim';
 import { api } from '../../src/api';
+import { useCurrency } from '../../src/currency';
 
 export default function Assets() {
   const router = useRouter();
+  const { formatFull } = useCurrency();
   const [items, setItems] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -44,7 +46,7 @@ export default function Assets() {
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Assets</Text>
-          <Text style={styles.subtitle}>Total: {formatCurrencyFull(total)}</Text>
+          <Text style={styles.subtitle}>Total: {formatFull(total)}</Text>
         </View>
       </View>
 
@@ -84,7 +86,7 @@ export default function Assets() {
                   <Text style={styles.cardSub}>{cat.label}</Text>
                   {item.description ? <Text style={styles.cardDesc} numberOfLines={1}>{item.description}</Text> : null}
                 </View>
-                <Text style={styles.cardValue}>{formatCurrencyFull(item.value)}</Text>
+                <Text style={styles.cardValue}>{formatFull(item.value)}</Text>
               </Pressable>
             </FadeInUp>
           );

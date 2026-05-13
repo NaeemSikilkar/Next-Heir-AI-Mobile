@@ -142,6 +142,7 @@ async def register(data: RegisterEmail):
         'mobile': None,
         'password': hash_password(data.password),
         'auth_method': 'email',
+        'currency': 'INR',
         'created_at': now_utc().isoformat(),
     }
     await db.users.insert_one(user_doc)
@@ -153,6 +154,7 @@ async def register(data: RegisterEmail):
             'full_name': data.full_name,
             'email': data.email,
             'mobile': None,
+            'currency': 'INR',
         },
     }
 
@@ -170,6 +172,7 @@ async def login(data: LoginEmail):
             'full_name': user.get('full_name'),
             'email': user.get('email'),
             'mobile': user.get('mobile'),
+            'currency': user.get('currency', 'INR'),
         },
     }
 
@@ -201,6 +204,7 @@ async def verify_otp(data: OTPVerify):
             'mobile': data.mobile,
             'password': None,
             'auth_method': 'mobile',
+            'currency': 'INR',
             'created_at': now_utc().isoformat(),
         }
         await db.users.insert_one(user)
@@ -213,8 +217,22 @@ async def verify_otp(data: OTPVerify):
             'full_name': user.get('full_name'),
             'email': user.get('email'),
             'mobile': user.get('mobile'),
+            'currency': user.get('currency', 'INR'),
         },
     }
+
+
+class CurrencyUpdate(BaseModel):
+    currency: str
+
+
+@api_router.patch('/auth/me/currency')
+async def update_currency(data: CurrencyUpdate, user=Depends(get_current_user)):
+    allowed = {'INR', 'USD', 'EUR', 'GBP', 'AED', 'SGD', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'HKD'}
+    if data.currency not in allowed:
+        raise HTTPException(status_code=400, detail='Unsupported currency')
+    await db.users.update_one({'id': user['id']}, {'$set': {'currency': data.currency}})
+    return {'success': True, 'currency': data.currency}
 
 
 @api_router.get('/auth/me')
@@ -596,6 +614,13 @@ async def scenario_pdf(scenario_id: str, user=Depends(get_current_user)):
     asset_map = {a['id']: a for a in assets}
     member_map = {m['id']: m for m in family}
 
+    code = user.get('currency', 'INR')
+    symbols = {'INR': 'Rs.', 'USD': '$', 'EUR': 'EUR ', 'GBP': 'GBP ', 'AED': 'AED ', 'SGD': 'S$', 'JPY': 'JPY ', 'AUD': 'A$', 'CAD': 'C$', 'CHF': 'CHF ', 'CNY': 'CNY ', 'HKD': 'HK$'}
+    sym = symbols.get(code, 'Rs.')
+
+    def fmt(n):
+        return f"{sym}{(n or 0):,.0f}"
+
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=50, bottomMargin=40)
     styles = getSampleStyleSheet()
@@ -612,7 +637,7 @@ async def scenario_pdf(scenario_id: str, user=Depends(get_current_user)):
         story.append(Spacer(1, 12))
 
     total_value = sum(a.get('value', 0) for a in assets)
-    story.append(Paragraph(f"<b>Total Estate Value:</b> ₹{total_value:,.0f}", body_style))
+    story.append(Paragraph(f"<b>Total Estate Value:</b> {fmt(total_value)}", body_style))
     story.append(Paragraph(f"<b>Generated:</b> {now_utc().strftime('%d %b %Y, %H:%M UTC')}", body_style))
     story.append(Spacer(1, 12))
 
@@ -621,7 +646,7 @@ async def scenario_pdf(scenario_id: str, user=Depends(get_current_user)):
     headers = ['Asset', 'Value'] + [m['name'] for m in family]
     data_rows = [headers]
     for a in assets:
-        row = [a['name'], f"₹{a.get('value', 0):,.0f}"]
+        row = [a['name'], fmt(a.get('value', 0))]
         alloc_for_asset = (scenario.get('allocations') or {}).get(a['id'], {})
         for m in family:
             pct = alloc_for_asset.get(m['id'], 0)
@@ -655,7 +680,7 @@ async def scenario_pdf(scenario_id: str, user=Depends(get_current_user)):
                 continue
             total += asset.get('value', 0) * float(alloc.get(m['id'], 0)) / 100.0
         share = (total / total_value * 100) if total_value else 0
-        member_totals.append([m['name'], m.get('relationship', ''), f"₹{total:,.0f}", f"{share:.1f}%"])
+        member_totals.append([m['name'], m.get('relationship', ''), fmt(total), f"{share:.1f}%"])
     if member_totals:
         t2 = Table([['Member', 'Relationship', 'Inheritance', 'Share %']] + member_totals, repeatRows=1)
         t2.setStyle(TableStyle([

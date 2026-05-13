@@ -3,10 +3,11 @@ import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, Alert, I
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, radius, typography, shadows, formatCurrency, ASSET_CATEGORIES } from '../../src/theme';
+import { colors, spacing, radius, typography, shadows, ASSET_CATEGORIES } from '../../src/theme';
 import { FadeInUp, Floating, Pulse } from '../../src/anim';
 import { api } from '../../src/api';
 import { useAuth } from '../../src/auth';
+import { useCurrency, CurrencyPickerButton } from '../../src/currency';
 
 const HOW_IT_WORKS = [
   { title: 'Add Assets', desc: 'Property, businesses, investments, precious metals', icon: 'briefcase-outline' },
@@ -27,6 +28,7 @@ const TIPS = [
 export default function Dashboard() {
   const router = useRouter();
   const { user, signOut } = useAuth();
+  const { format } = useCurrency();
   const [data, setData] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -71,9 +73,12 @@ export default function Dashboard() {
             <Text style={styles.greeting}>Welcome back</Text>
             <Text style={styles.userName}>{user?.full_name || 'User'}</Text>
           </View>
-          <Pressable testID="signout-btn" onPress={onSignOut} style={styles.iconBtn}>
-            <Ionicons name="log-out-outline" size={22} color={colors.textSecondary} />
-          </Pressable>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <CurrencyPickerButton testID="header-currency-btn" compact />
+            <Pressable testID="signout-btn" onPress={onSignOut} style={styles.iconBtn}>
+              <Ionicons name="log-out-outline" size={22} color={colors.textSecondary} />
+            </Pressable>
+          </View>
         </View>
 
         <FadeInUp delay={50}>
@@ -82,7 +87,7 @@ export default function Dashboard() {
               <Ionicons name="diamond" size={28} color={colors.primary} />
             </Floating>
             <Text style={styles.overline}>Total Estate Value</Text>
-            <Text style={styles.heroValue}>{formatCurrency(total)}</Text>
+            <Text style={styles.heroValue}>{format(total)}</Text>
             <Text style={styles.heroSub}>
               {data?.asset_count || 0} assets · {data?.family_count || 0} family · {data?.scenario_count || 0} scenarios
             </Text>
@@ -177,7 +182,7 @@ export default function Dashboard() {
                     <View style={{ flex: 1 }}>
                       <View style={styles.breakdownTop}>
                         <Text style={styles.breakdownLabel}>{c.label}</Text>
-                        <Text style={styles.breakdownValue}>{formatCurrency(v)}</Text>
+                        <Text style={styles.breakdownValue}>{format(v)}</Text>
                       </View>
                       <View style={styles.barTrack}>
                         <View style={[styles.barFill, { width: `${pct}%` }]} />

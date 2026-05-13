@@ -7,13 +7,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
-import { colors, spacing, radius, typography, shadows, formatCurrencyFull, ASSET_CATEGORIES } from '../../src/theme';
+import { colors, spacing, radius, typography, shadows, ASSET_CATEGORIES } from '../../src/theme';
 import { FadeInUp, Pulse, Floating } from '../../src/anim';
 import { api, API_BASE, getToken } from '../../src/api';
+import { useCurrency } from '../../src/currency';
 
 export default function ScenarioDetail() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { formatFull } = useCurrency();
   const [scenario, setScenario] = useState<any>(null);
   const [assets, setAssets] = useState<any[]>([]);
   const [family, setFamily] = useState<any[]>([]);
@@ -176,7 +178,7 @@ export default function ScenarioDetail() {
           <View style={styles.hero}>
             <View style={{ flex: 1 }}>
               <Text style={styles.overline}>Total Estate</Text>
-              <Text style={styles.heroValue}>{formatCurrencyFull(totalEstate)}</Text>
+              <Text style={styles.heroValue}>{formatFull(totalEstate)}</Text>
               {scenario.description ? (
                 <Text style={styles.heroDesc}>{scenario.description}</Text>
               ) : null}
@@ -272,7 +274,7 @@ export default function ScenarioDetail() {
                         </View>
                         <View style={{ flex: 1 }}>
                           <Text style={styles.memberName}>{m.name}</Text>
-                          <Text style={styles.memberRel}>{m.relationship} · {formatCurrencyFull(amt)}</Text>
+                          <Text style={styles.memberRel}>{m.relationship} · {formatFull(amt)}</Text>
                         </View>
                         <View style={styles.pctInputWrap}>
                           <TextInput
@@ -342,7 +344,7 @@ export default function ScenarioDetail() {
                     <View key={mid} style={styles.totalsRow}>
                       <Text style={styles.totalsName}>{info.name}</Text>
                       <Text style={styles.totalsAmount}>
-                        {formatCurrencyFull(info.amount)} · {info.percentage.toFixed(1)}%
+                        {formatFull(info.amount)} · {info.percentage.toFixed(1)}%
                       </Text>
                     </View>
                   ))}

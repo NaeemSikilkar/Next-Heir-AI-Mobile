@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { api, getToken, setToken, clearToken } from './api';
 
-type User = { id: string; full_name?: string; email?: string | null; mobile?: string | null };
+type User = { id: string; full_name?: string; email?: string | null; mobile?: string | null; currency?: string };
 
 type AuthCtx = {
   user: User | null;
@@ -11,6 +11,7 @@ type AuthCtx = {
   signInMobile: (mobile: string, otp: string, full_name?: string) => Promise<void>;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
+  setCurrency: (code: string) => Promise<void>;
 };
 
 const Ctx = createContext<AuthCtx | null>(null);
@@ -70,8 +71,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const setCurrency = async (code: string) => {
+    await api.setCurrency(code);
+    setUser((prev) => (prev ? { ...prev, currency: code } : prev));
+  };
+
   return (
-    <Ctx.Provider value={{ user, loading, signInEmail, signUpEmail, signInMobile, signOut, refresh }}>
+    <Ctx.Provider value={{ user, loading, signInEmail, signUpEmail, signInMobile, signOut, refresh, setCurrency }}>
       {children}
     </Ctx.Provider>
   );

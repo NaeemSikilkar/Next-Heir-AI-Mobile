@@ -3,12 +3,14 @@ import { View, Text, StyleSheet, FlatList, Pressable, Alert, RefreshControl } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, radius, typography, shadows, formatCurrencyFull } from '../../src/theme';
+import { colors, spacing, radius, typography, shadows } from '../../src/theme';
 import { FadeInUp, Floating } from '../../src/anim';
 import { api } from '../../src/api';
+import { useCurrency } from '../../src/currency';
 
 export default function Scenarios() {
   const router = useRouter();
+  const { formatFull } = useCurrency();
   const [items, setItems] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -88,7 +90,7 @@ export default function Scenarios() {
                   <View style={styles.metaItem}>
                     <Ionicons name="cash-outline" size={14} color={colors.textSecondary} />
                     <Text style={styles.metaText}>
-                      {totalEstate != null ? formatCurrencyFull(totalEstate) : 'Run analysis'}
+                      {totalEstate != null ? formatFull(totalEstate) : 'Run analysis'}
                     </Text>
                   </View>
                   <View style={styles.metaItem}>

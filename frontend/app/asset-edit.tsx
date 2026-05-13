@@ -8,10 +8,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, radius, typography, shadows, ASSET_CATEGORIES } from '../src/theme';
 import { api } from '../src/api';
+import { useCurrency } from '../src/currency';
 
 export default function AssetEdit() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const { symbol, code } = useCurrency();
   const [name, setName] = useState('');
   const [category, setCategory] = useState<string>('property');
   const [value, setValue] = useState('');
@@ -109,14 +111,14 @@ export default function AssetEdit() {
             ))}
           </View>
 
-          <Text style={styles.label}>Value (₹)</Text>
+          <Text style={styles.label}>Value ({symbol} {code})</Text>
           <View style={styles.field}>
             <TextInput
               testID="asset-value-input"
               style={styles.input}
               value={value}
               onChangeText={setValue}
-              placeholder="0"
+              placeholder={`${symbol} 0`}
               placeholderTextColor={colors.textDisabled}
               keyboardType="numeric"
             />

@@ -39,6 +39,7 @@ export const api = {
   verifyOtp: (data: { mobile: string; otp: string; full_name?: string }) =>
     request('/auth/mobile/verify-otp', { method: 'POST', body: JSON.stringify(data) }),
   me: () => request('/auth/me'),
+  setCurrency: (currency: string) => request('/auth/me/currency', { method: 'PATCH', body: JSON.stringify({ currency }) }),
 
   // dashboard
   dashboard: () => request('/dashboard'),

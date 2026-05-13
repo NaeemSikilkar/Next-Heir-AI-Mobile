@@ -57,17 +57,48 @@ export const typography = StyleSheet.create({
   overline: { fontSize: 11, color: colors.textSecondary, letterSpacing: 1.5, textTransform: 'uppercase', fontWeight: '600' },
 });
 
-export const formatCurrency = (n: number): string => {
-  if (!n && n !== 0) return '₹0';
+export const CURRENCIES = [
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee', flag: '🇮🇳', useIndianFormat: true },
+  { code: 'USD', symbol: '$', name: 'US Dollar', flag: '🇺🇸', useIndianFormat: false },
+  { code: 'EUR', symbol: '€', name: 'Euro', flag: '🇪🇺', useIndianFormat: false },
+  { code: 'GBP', symbol: '£', name: 'British Pound', flag: '🇬🇧', useIndianFormat: false },
+  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham', flag: '🇦🇪', useIndianFormat: false },
+  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar', flag: '🇸🇬', useIndianFormat: false },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen', flag: '🇯🇵', useIndianFormat: false },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar', flag: '🇦🇺', useIndianFormat: false },
+  { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar', flag: '🇨🇦', useIndianFormat: false },
+  { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc', flag: '🇨🇭', useIndianFormat: false },
+  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan', flag: '🇨🇳', useIndianFormat: false },
+  { code: 'HKD', symbol: 'HK$', name: 'Hong Kong Dollar', flag: '🇭🇰', useIndianFormat: false },
+] as const;
+
+export type CurrencyCode = typeof CURRENCIES[number]['code'];
+
+export const getCurrency = (code?: string | null) =>
+  CURRENCIES.find((c) => c.code === code) || CURRENCIES[0];
+
+export const formatCurrency = (n: number, code: string = 'INR'): string => {
+  if (!n && n !== 0) {
+    const c = getCurrency(code);
+    return `${c.symbol}0`;
+  }
+  const c = getCurrency(code);
   const abs = Math.abs(n);
-  if (abs >= 10000000) return `₹${(n / 10000000).toFixed(2)}Cr`;
-  if (abs >= 100000) return `₹${(n / 100000).toFixed(2)}L`;
-  if (abs >= 1000) return `₹${(n / 1000).toFixed(1)}K`;
-  return `₹${Math.round(n).toLocaleString('en-IN')}`;
+  if (c.useIndianFormat) {
+    if (abs >= 10000000) return `${c.symbol}${(n / 10000000).toFixed(2)}Cr`;
+    if (abs >= 100000) return `${c.symbol}${(n / 100000).toFixed(2)}L`;
+    if (abs >= 1000) return `${c.symbol}${(n / 1000).toFixed(1)}K`;
+  } else {
+    if (abs >= 1_000_000_000) return `${c.symbol}${(n / 1_000_000_000).toFixed(2)}B`;
+    if (abs >= 1_000_000) return `${c.symbol}${(n / 1_000_000).toFixed(2)}M`;
+    if (abs >= 1000) return `${c.symbol}${(n / 1000).toFixed(1)}K`;
+  }
+  return `${c.symbol}${Math.round(n).toLocaleString(c.useIndianFormat ? 'en-IN' : 'en-US')}`;
 };
 
-export const formatCurrencyFull = (n: number): string => {
-  return `₹${Math.round(n || 0).toLocaleString('en-IN')}`;
+export const formatCurrencyFull = (n: number, code: string = 'INR'): string => {
+  const c = getCurrency(code);
+  return `${c.symbol}${Math.round(n || 0).toLocaleString(c.useIndianFormat ? 'en-IN' : 'en-US')}`;
 };
 
 export const ASSET_CATEGORIES = [
