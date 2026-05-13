@@ -15,11 +15,17 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return;
     const inAuthGroup = segments[0] === '(auth)';
+    const inAdmin = segments[0] === 'admin';
     const atRoot = segments.length === 0 || segments[0] === undefined;
+    const isAdmin = user?.role === 'admin';
+
     if (!user && !inAuthGroup && !atRoot) {
       router.replace('/(auth)/welcome');
     } else if (user && (inAuthGroup || atRoot)) {
-      router.replace('/(tabs)/dashboard');
+      router.replace(isAdmin ? '/admin' : '/(tabs)/dashboard');
+    } else if (user && isAdmin && !inAdmin) {
+      // If admin is somewhere non-admin (e.g., tabs), keep them on admin page
+      // Only redirect on initial entry; skip if they're navigating intentionally
     }
   }, [user, loading, segments]);
 
@@ -52,6 +58,7 @@ export default function RootLayout() {
               <Stack.Screen name="index" options={{ headerShown: false }} />
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="admin" options={{ headerShown: false }} />
               <Stack.Screen name="asset-edit" options={{ title: 'Asset', presentation: 'modal' }} />
               <Stack.Screen name="family-edit" options={{ title: 'Family Member', presentation: 'modal' }} />
               <Stack.Screen name="scenario-edit" options={{ title: 'Scenario', presentation: 'modal' }} />

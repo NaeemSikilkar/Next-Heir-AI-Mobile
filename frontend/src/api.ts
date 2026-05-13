@@ -40,6 +40,9 @@ export const api = {
     request('/auth/mobile/verify-otp', { method: 'POST', body: JSON.stringify(data) }),
   me: () => request('/auth/me'),
   setCurrency: (currency: string) => request('/auth/me/currency', { method: 'PATCH', body: JSON.stringify({ currency }) }),
+  adminListUsers: () => request('/admin/users'),
+  adminStats: () => request('/admin/stats'),
+  adminExportUrl: () => `${API}/admin/users/export`,
 
   // dashboard
   dashboard: () => request('/dashboard'),

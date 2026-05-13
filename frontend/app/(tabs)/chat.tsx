@@ -28,6 +28,7 @@ export default function Chat() {
   const [scenarios, setScenarios] = useState<any[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   const listRef = useRef<FlatList>(null);
 
   useFocusEffect(useCallback(() => { (async () => {
@@ -238,6 +239,14 @@ export default function Chat() {
             maxLength={1000}
           />
           <Pressable
+            testID="chat-fullscreen-btn"
+            onPress={() => setFullscreen(true)}
+            style={({ pressed }) => [styles.fsBtn, pressed && { opacity: 0.7 }]}
+            hitSlop={6}
+          >
+            <Ionicons name="expand-outline" size={20} color={colors.primary} />
+          </Pressable>
+          <Pressable
             testID="chat-send"
             onPress={() => send(input)}
             disabled={!input.trim() || sending}
@@ -251,6 +260,68 @@ export default function Chat() {
           </Pressable>
         </View>
       </KeyboardAvoidingView>
+
+      {/* Fullscreen compose modal */}
+      <Modal visible={fullscreen} animationType="slide" onRequestClose={() => setFullscreen(false)}>
+        <SafeAreaView style={styles.fsRoot} edges={['top', 'bottom']}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={{ flex: 1 }}
+          >
+            <View style={styles.fsHeader}>
+              <Pressable onPress={() => setFullscreen(false)} hitSlop={10} testID="fs-close-btn" style={styles.fsClose}>
+                <Ionicons name="chevron-down" size={26} color={colors.textPrimary} />
+              </Pressable>
+              <View style={{ flex: 1, alignItems: 'center' }}>
+                <Text style={styles.fsTitle}>Compose Message</Text>
+                <Text style={styles.fsCount}>{input.length}/1000</Text>
+              </View>
+              <Pressable
+                testID="fs-send-btn"
+                disabled={!input.trim() || sending}
+                onPress={async () => {
+                  const text = input;
+                  setFullscreen(false);
+                  await new Promise((r) => setTimeout(r, 50));
+                  send(text);
+                }}
+                style={({ pressed }) => [
+                  styles.fsSend,
+                  (!input.trim() || sending) && { opacity: 0.4 },
+                  pressed && { transform: [{ scale: 0.96 }] },
+                ]}
+              >
+                <Ionicons name="arrow-up" size={18} color={colors.textInverse} />
+                <Text style={styles.fsSendText}>Send</Text>
+              </Pressable>
+            </View>
+
+            <TextInput
+              testID="fs-input"
+              style={styles.fsInput}
+              placeholder="Type your full question or thoughts here..."
+              placeholderTextColor={colors.textDisabled}
+              value={input}
+              onChangeText={setInput}
+              multiline
+              autoFocus
+              maxLength={1000}
+              textAlignVertical="top"
+            />
+
+            <View style={styles.fsFooter}>
+              <View style={styles.fsHint}>
+                <Ionicons name="sparkles" size={12} color={colors.primary} />
+                <Text style={styles.fsHintText}>
+                  {selectedIds.length > 0
+                    ? `${selectedIds.length} scenario(s) attached for comparison`
+                    : 'Tip: Pick "Compare" in the chat header to attach scenarios.'}
+                </Text>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </Modal>
 
       {/* Scenario picker modal */}
       <Modal
@@ -402,6 +473,33 @@ const styles = StyleSheet.create({
     width: 48, height: 48, borderRadius: 24, backgroundColor: colors.primary,
     alignItems: 'center', justifyContent: 'center', ...shadows.glow,
   },
+  fsBtn: {
+    width: 40, height: 40, borderRadius: 20, backgroundColor: colors.paper,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: colors.borderGold,
+  },
+  fsRoot: { flex: 1, backgroundColor: colors.bg },
+  fsHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
+  },
+  fsClose: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center' },
+  fsTitle: { color: colors.textPrimary, fontSize: 16, fontWeight: '700' },
+  fsCount: { color: colors.textSecondary, fontSize: 11, marginTop: 2 },
+  fsSend: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.pill,
+    backgroundColor: colors.primary, ...shadows.glow,
+  },
+  fsSendText: { color: colors.textInverse, fontWeight: '700', fontSize: 13 },
+  fsInput: {
+    flex: 1, color: colors.textPrimary, fontSize: 18, lineHeight: 26,
+    padding: spacing.lg, backgroundColor: colors.bg,
+  },
+  fsFooter: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderTopWidth: 1, borderTopColor: colors.border },
+  fsHint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  fsHintText: { color: colors.textSecondary, fontSize: 12, flex: 1 },
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'flex-end' },
   sheet: {
     backgroundColor: colors.paper, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl,

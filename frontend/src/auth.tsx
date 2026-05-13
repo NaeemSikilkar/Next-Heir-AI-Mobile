@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { api, getToken, setToken, clearToken } from './api';
 
-type User = { id: string; full_name?: string; email?: string | null; mobile?: string | null; currency?: string };
+type User = { id: string; full_name?: string; email?: string | null; mobile?: string | null; currency?: string; role?: string };
 
 type AuthCtx = {
   user: User | null;

@@ -22,6 +22,8 @@ from reportlab.lib.units import inch
 from reportlab.lib.colors import HexColor
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -173,6 +175,7 @@ async def login(data: LoginEmail):
             'email': user.get('email'),
             'mobile': user.get('mobile'),
             'currency': user.get('currency', 'INR'),
+            'role': user.get('role', 'user'),
         },
     }
 
@@ -764,6 +767,122 @@ async def dashboard(user=Depends(get_current_user)):
 @api_router.get('/')
 async def root():
     return {'message': 'NextHeir API', 'status': 'ok'}
+
+
+# ============ Admin ============
+ADMIN_EMAIL = 'admin@nextheir.com'
+ADMIN_PASSWORD = 'Admin@123'
+
+
+async def require_admin(user=Depends(get_current_user)):
+    if user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail='Admin access required')
+    return user
+
+
+@api_router.get('/admin/users')
+async def admin_list_users(admin=Depends(require_admin)):
+    users = await db.users.find({}, {'_id': 0, 'password': 0}).sort('created_at', -1).to_list(5000)
+    return users
+
+
+@api_router.get('/admin/stats')
+async def admin_stats(admin=Depends(require_admin)):
+    total_users = await db.users.count_documents({})
+    total_assets = await db.assets.count_documents({})
+    total_family = await db.family.count_documents({})
+    total_scenarios = await db.scenarios.count_documents({})
+    total_chats = await db.chat_messages.count_documents({})
+    by_method = {}
+    async for u in db.users.find({}, {'auth_method': 1, '_id': 0}):
+        by_method[u.get('auth_method', 'unknown')] = by_method.get(u.get('auth_method', 'unknown'), 0) + 1
+    return {
+        'total_users': total_users,
+        'total_assets': total_assets,
+        'total_family': total_family,
+        'total_scenarios': total_scenarios,
+        'total_chats': total_chats,
+        'by_auth_method': by_method,
+    }
+
+
+@api_router.get('/admin/users/export')
+async def admin_export_users(admin=Depends(require_admin)):
+    users = await db.users.find({}, {'_id': 0, 'password': 0}).sort('created_at', -1).to_list(10000)
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'NextHeir Users'
+
+    headers = ['User Name', 'Email ID', 'Phone Number', 'Sign Up Date', 'Auth Method', 'Currency', 'Role']
+    ws.append(headers)
+    header_fill = PatternFill(start_color='0A0A0E', end_color='0A0A0E', fill_type='solid')
+    header_font = Font(name='Calibri', size=11, bold=True, color='D4AF37')
+    for col_idx in range(1, len(headers) + 1):
+        cell = ws.cell(row=1, column=col_idx)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+
+    for u in users:
+        created = u.get('created_at', '')
+        try:
+            if created:
+                # Format ISO timestamp -> "13 May 2026 06:43 UTC"
+                dt = datetime.fromisoformat(created.replace('Z', '+00:00'))
+                created = dt.strftime('%d %b %Y, %H:%M UTC')
+        except Exception:
+            pass
+        ws.append([
+            u.get('full_name', '') or '',
+            u.get('email', '') or '',
+            u.get('mobile', '') or '',
+            created,
+            u.get('auth_method', '') or '',
+            u.get('currency', 'INR') or 'INR',
+            u.get('role', 'user') or 'user',
+        ])
+
+    widths = [24, 30, 18, 24, 14, 12, 10]
+    for i, w in enumerate(widths, start=1):
+        ws.column_dimensions[chr(64 + i)].width = w
+    ws.freeze_panes = 'A2'
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    filename = f'nextheir-users-{now_utc().strftime("%Y%m%d-%H%M")}.xlsx'
+    return Response(
+        content=buf.read(),
+        media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'},
+    )
+
+
+@app.on_event("startup")
+async def seed_admin():
+    try:
+        existing = await db.users.find_one({'email': ADMIN_EMAIL})
+        if existing:
+            # Ensure role is admin and password is current
+            await db.users.update_one(
+                {'email': ADMIN_EMAIL},
+                {'$set': {'role': 'admin', 'password': hash_password(ADMIN_PASSWORD)}},
+            )
+        else:
+            await db.users.insert_one({
+                'id': str(uuid.uuid4()),
+                'full_name': 'NextHeir Admin',
+                'email': ADMIN_EMAIL,
+                'mobile': None,
+                'password': hash_password(ADMIN_PASSWORD),
+                'auth_method': 'email',
+                'role': 'admin',
+                'currency': 'INR',
+                'created_at': now_utc().isoformat(),
+            })
+        logging.info("Admin user ensured: %s", ADMIN_EMAIL)
+    except Exception as e:
+        logging.exception("Failed to seed admin: %s", e)
 
 
 app.include_router(api_router)

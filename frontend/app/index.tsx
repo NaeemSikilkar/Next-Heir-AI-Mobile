@@ -10,7 +10,10 @@ export default function Index() {
 
   useEffect(() => {
     if (loading) return;
-    if (user) router.replace('/(tabs)/dashboard');
+    if (user) {
+      if (user.role === 'admin') router.replace('/admin');
+      else router.replace('/(tabs)/dashboard');
+    }
     else router.replace('/(auth)/welcome');
   }, [user, loading]);
 
