@@ -34,7 +34,8 @@ db = client[os.environ['DB_NAME']]
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'change-me')
 JWT_ALG = 'HS256'
-EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+genai.configure(api_key=GEMINI_API_KEY)
 
 app = FastAPI(title="NextHeir API")
 api_router = APIRouter(prefix="/api")
