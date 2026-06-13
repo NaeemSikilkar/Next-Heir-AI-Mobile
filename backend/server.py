@@ -431,13 +431,13 @@ Return ONLY a valid JSON object with these exact keys (no markdown, no backticks
 Consider equality, need-based fairness, conflict risk between siblings, financial vulnerability, and long-term family harmony."""
 
     try:
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"analyze-{scenario_id}-{uuid.uuid4()}",
-            system_message="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested.",
-        ).with_model("gemini", "gemini-3-flash-preview")
-        response = await chat.send_message(UserMessage(text=prompt))
-        text = response.strip()
+        model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested."
+)
+
+response = model.generate_content(prompt)
+text = response.text.strip()
         # Strip code fences if any
         if text.startswith('```'):
             text = text.split('```', 2)[1]
