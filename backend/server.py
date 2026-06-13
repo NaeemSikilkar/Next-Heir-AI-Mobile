@@ -15,7 +15,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+import google.generativeai as genai
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
