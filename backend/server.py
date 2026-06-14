@@ -15,7 +15,8 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -35,7 +36,7 @@ db = client[os.environ['DB_NAME']]
 JWT_SECRET = os.environ.get('JWT_SECRET', 'change-me')
 JWT_ALG = 'HS256'
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-genai.configure(api_key=GEMINI_API_KEY)
+client_genai = genai.Client(api_key=GEMINI_API_KEY)
 
 app = FastAPI(title="NextHeir API")
 api_router = APIRouter(prefix="/api")
@@ -431,12 +432,11 @@ Return ONLY a valid JSON object with these exact keys (no markdown, no backticks
 Consider equality, need-based fairness, conflict risk between siblings, financial vulnerability, and long-term family harmony."""
 
     try:
-        model = genai.GenerativeModel(
-            model_name="gemini-3-flash-preview",
-            system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested."
+        response = client_genai.models.generate_content(
+            model_name="gemini-2.0-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig (system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested."
         )
-
-        response = model.generate_content(prompt)
         text = response.text.strip()
 
         # Strip code fences if any
@@ -555,7 +555,7 @@ Never provide legal or tax advice — always remind users to consult their CA or
 
     try:
         model = genai.GenerativeModel(
-            model_name="gemini-3-flash-preview",
+            model_name="gemini-2.0-flash",
             system_instruction=system_msg
         )
 
