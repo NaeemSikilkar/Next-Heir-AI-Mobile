@@ -542,13 +542,13 @@ Never provide legal or tax advice — always remind users to consult their CA or
 {context}{scenarios_block}"""
 
     try:
-        chat = LlmChat(
-            api_key=GEMINI_API_KEY,
-            session_id=session_id,
-            system_message=system_msg,
-        ).with_model("gemini", "gemini-3-flash-preview")
+        model = genai.GenerativeModel(
+    model_name="gemini-3-flash-preview",
+    system_instruction=system_msg
+)
 
-        response_text = await chat.send_message(UserMessage(text=data.message))
+response = model.generate_content(data.message)
+response_text = response.text
     except Exception as e:
         logging.exception("AI chat failed: %s", e)
         response_text = "I'm having trouble connecting right now. Please try again in a moment."
