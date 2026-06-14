@@ -554,16 +554,17 @@ Never provide legal or tax advice — always remind users to consult their CA or
 {context}{scenarios_block}"""
 
     try:
-        model = genai.GenerativeModel(
-    model_name="gemini-3-flash-preview",
-    system_instruction=system_msg
-)
+    model = genai.GenerativeModel(
+        model_name="gemini-3-flash-preview",
+        system_instruction=system_msg
+    )
 
-response = model.generate_content(data.message)
-response_text = response.text
-    except Exception as e:
-        logging.exception("AI chat failed: %s", e)
-        response_text = "I'm having trouble connecting right now. Please try again in a moment."
+    response = model.generate_content(data.message)
+    response_text = response.text
+
+except Exception as e:
+    logging.exception("AI chat failed: %s", e)
+    response_text = "I'm having trouble connecting right now. Please try again in a moment."
 
     ts = now_utc().isoformat()
     await db.chat_messages.insert_many([
