@@ -430,23 +430,26 @@ Return ONLY a valid JSON object with these exact keys (no markdown, no backticks
 
 Consider equality, need-based fairness, conflict risk between siblings, financial vulnerability, and long-term family harmony."""
 
-    try:
-        model = genai.GenerativeModel(
-    model_name="gemini-3-flash-preview",
-    system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested."
-)
+try:
+    model = genai.GenerativeModel(
+        model_name="gemini-3-flash-preview",
+        system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested."
+    )
 
-response = model.generate_content(prompt)
-text = response.text.strip()
-        # Strip code fences if any
-        if text.startswith('```'):
-            text = text.split('```', 2)[1]
-            if text.startswith('json'):
-                text = text[4:]
-            text = text.strip().rstrip('```').strip()
-        analysis = json.loads(text)
-    except Exception as e:
-        logging.exception("AI analysis failed: %s", e)
+    response = model.generate_content(prompt)
+    text = response.text.strip()
+
+    # Strip code fences if any
+    if text.startswith('```'):
+        text = text.split('```', 2)[1]
+        if text.startswith('json'):
+            text = text[4:]
+        text = text.strip().rstrip('```').strip()
+
+    analysis = json.loads(text)
+
+except Exception as e:
+    logging.exception("AI analysis failed: %s", e)
         analysis = {
             "fairness_score": 50,
             "fairness_label": "Medium",
