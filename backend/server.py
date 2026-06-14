@@ -444,15 +444,16 @@ Consider equality, need-based fairness, conflict risk between siblings, financia
                 text = text[4:]
             text = text.strip().rstrip('```').strip()
         analysis = json.loads(text)
-    except Exception as e:
-        logging.exception("AI analysis failed: %s", e)
-        analysis = {
-            "fairness_score": 50,
-            "fairness_label": "Medium",
-            "summary": "Unable to perform full AI analysis at this time. Please review the distribution manually.",
-            "strengths": [],
-            "risks": [{"level": "medium", "title": "AI analysis unavailable", "detail": "Try regenerating the analysis."}],
-            "recommendations": ["Add more details to your assets and family members.", "Try analyzing again."],
+except Exception as e:
+    logging.exception("AI analysis failed: %s", e)
+        
+    analysis = {
+        "fairness_score": 50,
+        "fairness_label": "Medium",
+        "summary": "Unable to perform full AI analysis at this time. Please review the distribution manually.",
+        "strengths": [],
+        "risks": [{"level": "medium", "title": "AI analysis unavailable", "detail": "Try regenerating the analysis."}],
+        "recommendations": ["Add more details to your assets and family members.", "Try analyzing again."],
         }
 
     analysis['totals_by_member'] = {
