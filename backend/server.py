@@ -554,12 +554,12 @@ Never provide legal or tax advice — always remind users to consult their CA or
 {context}{scenarios_block}"""
 
     try:
-        model = genai.GenerativeModel(
+        response = client_genai.models.generate_content(
             model_name="gemini-2.0-flash",
-            system_instruction=system_msg
+            contents=data.message,
+            config=types.GenerateContentConfig (system_instruction=system_msg)
         )
 
-        response = model.generate_content(data.message)
         response_text = response.text
 
     except Exception as e:
