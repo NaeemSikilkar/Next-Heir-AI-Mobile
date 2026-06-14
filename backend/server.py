@@ -432,7 +432,7 @@ Consider equality, need-based fairness, conflict risk between siblings, financia
 
     try:
         model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
+    model_name="",
     system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested."
 )
 
@@ -543,7 +543,7 @@ Never provide legal or tax advice — always remind users to consult their CA or
 
     try:
         model = genai.GenerativeModel(
-    model_name="gemini-3-flash-preview",
+    model_name="",
     system_instruction=system_msg
 )
 
