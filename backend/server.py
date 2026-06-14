@@ -543,7 +543,7 @@ Never provide legal or tax advice — always remind users to consult their CA or
 
     try:
         model = genai.GenerativeModel(
-    model_name="",
+    model_name="gemini-3-flash-preview",
     system_instruction=system_msg
 )
 
