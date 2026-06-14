@@ -543,7 +543,7 @@ Never provide legal or tax advice — always remind users to consult their CA or
 
     try:
         chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
+            api_key=GEMINI_API_KEY,
             session_id=session_id,
             system_message=system_msg,
         ).with_model("gemini", "gemini-3-flash-preview")
