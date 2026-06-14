@@ -478,11 +478,11 @@ analysis['totals_by_member'] = {
 
 analysis['total_estate_value'] = total_value
 
-    await db.scenarios.update_one(
-        {'id': scenario_id, 'user_id': user['id']},
-        {'$set': {'analysis': analysis, 'updated_at': now_utc().isoformat()}},
-    )
-    return analysis
+await db.scenarios.update_one(
+    {'id': scenario_id, 'user_id': user['id']},
+    {'$set': {'analysis': analysis, 'updated_at': now_utc().isoformat()}},
+)
+return analysis
 
 
 # ============ AI Chat ============
