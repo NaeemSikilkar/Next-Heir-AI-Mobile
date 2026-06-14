@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BASE = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+const BASE = 'https://next-heir-ai-mobile.onrender.com';
 const API = `${BASE}/api`;
 
 export const getToken = async () => AsyncStorage.getItem('nh_token');
