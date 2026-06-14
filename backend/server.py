@@ -449,25 +449,34 @@ try:
     analysis = json.loads(text)
 
 except Exception as e:
-logging.exception("AI analysis failed: %s", e)
-analysis = {
-    "fairness_score": 50,
-    "fairness_label": "Medium",
-    "summary": "Unable to perform full AI analysis at this time. Please review the distribution manually.",
-    "strengths": [],
-    "risks": [{"level": "medium", "title": "AI analysis unavailable", "detail": "Try regenerating the analysis."}],
-    "recommendations": ["Add more details to your assets and family members.", "Try analyzing again."],
+    logging.exception("AI analysis failed: %s", e)
+
+    analysis = {
+        "fairness_score": 50,
+        "fairness_label": "Medium",
+        "summary": "Unable to perform full AI analysis at this time. Please review the distribution manually.",
+        "strengths": [],
+        "risks": [{
+            "level": "medium",
+            "title": "AI analysis unavailable",
+            "detail": "Try regenerating the analysis."
+        }],
+        "recommendations": [
+            "Add more details to your assets and family members.",
+            "Try analyzing again."
+        ],
     }
 
-    analysis['totals_by_member'] = {
-        mid: {
-            'name': member_map.get(mid, {}).get('name', 'Unknown'),
-            'amount': member_totals[mid],
-            'percentage': (member_totals[mid] / total_value * 100) if total_value else 0,
-        }
-        for mid in member_totals
+analysis['totals_by_member'] = {
+    mid: {
+        'name': member_map.get(mid, {}).get('name', 'Unknown'),
+        'amount': member_totals[mid],
+        'percentage': (member_totals[mid] / total_value * 100) if total_value else 0,
     }
-    analysis['total_estate_value'] = total_value
+    for mid in member_totals
+}
+
+analysis['total_estate_value'] = total_value
 
     await db.scenarios.update_one(
         {'id': scenario_id, 'user_id': user['id']},
