@@ -430,59 +430,59 @@ Return ONLY a valid JSON object with these exact keys (no markdown, no backticks
 
 Consider equality, need-based fairness, conflict risk between siblings, financial vulnerability, and long-term family harmony."""
 
-try:
-    model = genai.GenerativeModel(
-        model_name="gemini-3-flash-preview",
-        system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested."
+    try:
+        model = genai.GenerativeModel(
+            model_name="gemini-3-flash-preview",
+            system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested."
+        )
+
+        response = model.generate_content(prompt)
+        text = response.text.strip()
+
+        # Strip code fences if any
+        if text.startswith('```'):
+            text = text.split('```', 2)[1]
+            if text.startswith('json'):
+                text = text[4:]
+            text = text.strip().rstrip('```').strip()
+
+        analysis = json.loads(text)
+
+    except Exception as e:
+        logging.exception("AI analysis failed: %s", e)
+
+        analysis = {
+            "fairness_score": 50,
+            "fairness_label": "Medium",
+            "summary": "Unable to perform full AI analysis at this time. Please review the distribution manually.",
+            "strengths": [],
+            "risks": [{
+                "level": "medium",
+                "title": "AI analysis unavailable",
+                "detail": "Try regenerating the analysis."
+            }],
+            "recommendations": [
+                "Add more details to your assets and family members.",
+                "Try analyzing again."
+            ],
+        }
+
+    analysis['totals_by_member'] = {
+        mid: {
+            'name': member_map.get(mid, {}).get('name', 'Unknown'),
+            'amount': member_totals[mid],
+            'percentage': (member_totals[mid] / total_value * 100) if total_value else 0,
+        }
+        for mid in member_totals
+    }
+
+    analysis['total_estate_value'] = total_value
+
+    await db.scenarios.update_one(
+        {'id': scenario_id, 'user_id': user['id']},
+        {'$set': {'analysis': analysis, 'updated_at': now_utc().isoformat()}},
     )
-
-    response = model.generate_content(prompt)
-    text = response.text.strip()
-
-    # Strip code fences if any
-    if text.startswith('```'):
-        text = text.split('```', 2)[1]
-        if text.startswith('json'):
-            text = text[4:]
-        text = text.strip().rstrip('```').strip()
-
-    analysis = json.loads(text)
-
-except Exception as e:
-    logging.exception("AI analysis failed: %s", e)
-
-    analysis = {
-        "fairness_score": 50,
-        "fairness_label": "Medium",
-        "summary": "Unable to perform full AI analysis at this time. Please review the distribution manually.",
-        "strengths": [],
-        "risks": [{
-            "level": "medium",
-            "title": "AI analysis unavailable",
-            "detail": "Try regenerating the analysis."
-        }],
-        "recommendations": [
-            "Add more details to your assets and family members.",
-            "Try analyzing again."
-        ],
-    }
-
-analysis['totals_by_member'] = {
-    mid: {
-        'name': member_map.get(mid, {}).get('name', 'Unknown'),
-        'amount': member_totals[mid],
-        'percentage': (member_totals[mid] / total_value * 100) if total_value else 0,
-    }
-    for mid in member_totals
-}
-
-analysis['total_estate_value'] = total_value
-
-await db.scenarios.update_one(
-    {'id': scenario_id, 'user_id': user['id']},
-    {'$set': {'analysis': analysis, 'updated_at': now_utc().isoformat()}},
-)
-return analysis
+    return analysis
 
 
 # ============ AI Chat ============
@@ -557,7 +557,7 @@ Never provide legal or tax advice — always remind users to consult their CA or
         model = genai.GenerativeModel(
             model_name="gemini-3-flash-preview",
             system_instruction=system_msg
-    )
+        )
 
         response = model.generate_content(data.message)
         response_text = response.text
