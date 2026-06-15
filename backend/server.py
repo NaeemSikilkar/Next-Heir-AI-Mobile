@@ -435,7 +435,8 @@ Consider equality, need-based fairness, conflict risk between siblings, financia
         response = client_genai.models.generate_content(
             model="gemini-2.0-flash",
             contents=prompt,
-            config=types.GenerateContentConfig(system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested.")
+            config=types.GenerateContentConfig(system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested.",
+                                              response_mime_type="application/json")
         )
         text = response.text.strip()
 
