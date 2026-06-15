@@ -433,7 +433,7 @@ Consider equality, need-based fairness, conflict risk between siblings, financia
 
     try:
         response = client_genai.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3-flash-preview",
             contents=prompt,
             config=types.GenerateContentConfig(system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested.",
                                               response_mime_type="application/json")
@@ -556,7 +556,7 @@ Never provide legal or tax advice — always remind users to consult their CA or
 
     try:
         response = client_genai.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3-flash-preview",
             contents=data.message,
             config=types.GenerateContentConfig(system_instruction=system_msg)
         )
