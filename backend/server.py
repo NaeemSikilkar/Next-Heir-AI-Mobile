@@ -25,6 +25,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib import colors
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
+logging.basicConfig(level=logging.INFO)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -432,13 +433,19 @@ Return ONLY a valid JSON object with these exact keys (no markdown, no backticks
 Consider equality, need-based fairness, conflict risk between siblings, financial vulnerability, and long-term family harmony."""
 
     try:
+        logging.info("Starting Gemini analysis request")
+        
         response = client_genai.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(system_instruction="You are NextHeir AI, an expert inheritance and wealth distribution advisor. Always respond with valid JSON only when requested.",
                                               response_mime_type="application/json")
         )
+        logging.info("Gemini analysis response received")
+        
         text = response.text.strip()
+
+        logging.info(f"Gemini response text: {text[:500]}")
 
         # Strip code fences if any
         if text.startswith('```'):
@@ -555,13 +562,18 @@ Never provide legal or tax advice — always remind users to consult their CA or
 {context}{scenarios_block}"""
 
     try:
+        logging.info("Starting Gemini chat request")
+            
         response = client_genai.models.generate_content(
             model="gemini-2.5-flash",
             contents=data.message,
             config=types.GenerateContentConfig(system_instruction=system_msg)
         )
+        logging.info("Gemini chat response received")
 
         response_text = response.text
+        
+        logging.info(f"Chat response: {response_text[:500]}")
 
     except Exception as e:
         logging.exception("AI chat failed: %s", e)
