@@ -555,7 +555,7 @@ Never provide legal or tax advice — always remind users to consult their CA or
 
     try:
         response = client_genai.models.generate_content(
-            model_name="gemini-2.0-flash",
+            model="gemini-2.0-flash",
             contents=data.message,
             config=types.GenerateContentConfig (system_instruction=system_msg)
         )
