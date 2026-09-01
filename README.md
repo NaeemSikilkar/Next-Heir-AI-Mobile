@@ -10,7 +10,7 @@ Please note the it might take upto 3mins to start and login for the first time a
 
 # NextHeir AI Mobile App Screenshots
 
-<img width="575" height="1280" alt="1" src="https://github.com/user-attachments/assets/d2379e41-dd82-423d-abdb-f60bb1ddd0d4" />
+<img width="250" height="720" alt="1" src="https://github.com/user-attachments/assets/d2379e41-dd82-423d-abdb-f60bb1ddd0d4" />
 
 <img width="575" height="1280" alt="2" src="https://github.com/user-attachments/assets/94115eb2-9387-46be-a0d4-4bacbedd65dc" />
 
