@@ -5,7 +5,7 @@ Thats what this product NextHeir AI solves in todays world. NextHeir is an AI-po
 # Download the app now
 Download the mobile app to test it on your phone. Scan the QR below to download it from a GDrive link.
 Please note the it might take upto 3mins to start and login for the first time as it is just a demo version.
-<img width="720" height="720" alt="QR NextHeirAI" src="https://github.com/user-attachments/assets/5d8ed906-84f2-4988-a883-1f0d26a14ef8" />
+<img width="500" height="500" alt="QR NextHeirAI" src="https://github.com/user-attachments/assets/5d8ed906-84f2-4988-a883-1f0d26a14ef8" />
 
 
 # NextHeir AI Mobile App Screenshots
