@@ -1,6 +1,6 @@
 # NextHeir AI
-
-NextHeir is an AI-powered inheritance decision platform designed for high-net-worth individuals to simulate wealth distribution and avoid family conflicts.
+Have you ever wondered how your grandparents might have approached inheritance if they had access to AI like ChatGPT or Claude? What if AI could have helped them explore different ways to distribute their property and wealth, understand the potential consequences for each child, and identify possible sources of conflict — not to make the decision for them, but to help preserve family relationships for generations to come?
+Thats what this product NextHeir AI solves in todays world. NextHeir is an AI-powered inheritance decision platform designed for individuals to simulate wealth distribution and avoid family conflicts.
 
 ---
 
